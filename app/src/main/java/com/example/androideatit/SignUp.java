@@ -83,11 +83,11 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 final ProgressDialog mDialog = new ProgressDialog(SignUp.this);
-                mDialog.setMessage("Please waiting...");
+                mDialog.setMessage("Please waiting....");
                 mDialog.show();
 
                 // 아이디, 이름, 번호 다 입력했는지 체크
-               table_user.addValueEventListener(new ValueEventListener() {
+               table_user.addValueEventListener(new ValueEventListener(){
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         //Check if already user phone
