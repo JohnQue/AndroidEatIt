@@ -16,12 +16,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtPhone"
-            android:hint="스마트폰 번호"
+            android:id="@+id/logId"
+            android:hint="아이디"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColorHint="@android:color/white"
-            android:text="0988123344"
+            android:text="01063274801"
             android:textColor="@android:color/white"
             android:textSize="34sp"
             android:inputType="phone"
@@ -32,7 +32,7 @@
             app:met_singleLineEllipsis="true"
             />
         <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edtPassword"
+            android:id="@+id/logPassword"
             android:hint="비밀번호"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

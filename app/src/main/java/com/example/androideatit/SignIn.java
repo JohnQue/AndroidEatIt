@@ -22,7 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 public class SignIn extends AppCompatActivity {
-    EditText edtPhone, edtPassword;
+    EditText logId, logPassword;
     CheckBox edtCheck;
     Button btnSignIn;
 
@@ -31,8 +31,8 @@ public class SignIn extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-        edtPassword = (MaterialEditText)findViewById(R.id.edtPassword);
-        edtPhone = (MaterialEditText)findViewById(R.id.edtPhone);
+        logPassword = (MaterialEditText)findViewById(R.id.logPassword);
+        logId = (MaterialEditText)findViewById(R.id.logId);
         edtCheck = findViewById(R.id.edtCheck);
         btnSignIn = findViewById(R.id.btnSignIn);
 
@@ -51,22 +51,23 @@ public class SignIn extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         //Check if user not exist in database
-                        if (dataSnapshot.child(edtPhone.getText().toString()).exists()) {
+                        if (dataSnapshot.child(logId.getText().toString()).exists()) {
                             //Get User information
                             mDialog.dismiss();
-                            User user = dataSnapshot.child(edtPhone.getText().toString()).getValue(User.class);
-                            if (user.getPassword().equals(edtPassword.getText().toString())){
+                            User user = dataSnapshot.child(logId.getText().toString()).getValue(User.class);
+                            if (user.getPassword().equals(logPassword.getText().toString())){
                                 if(edtCheck.isChecked()){
                                     //phone, password 일치시, 자동 로그인에 필요한 정보 저장
                                     SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
                                     SharedPreferences.Editor editor = pref.edit();
-                                    editor.putString("edtPhone", edtPhone.getText().toString());
-                                    editor.putString("edtPassword", edtPassword.getText().toString());
+                                    editor.putString("edtPhone", logId.getText().toString());
+                                    editor.putString("logPassword", logPassword.getText().toString());
                                     editor.apply();
                                 }
 
                                 Toast.makeText(SignIn.this, user.getName()+"님 환영합니다!", Toast.LENGTH_SHORT).show();
                                 Intent homeIntent = new Intent(SignIn.this, Home.class);
+                                homeIntent.putExtra("userName", user.getName());
                                 Common.currentUser = user;
                                 startActivity(homeIntent);
                                 finish();

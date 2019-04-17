@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.androideatit.Model.User;
@@ -20,20 +18,25 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.util.Calendar;
 
+import info.hoang8f.widget.FButton;
+
 public class SignUp extends AppCompatActivity {
 
-    private MaterialEditText edtPhone, edtName, edtPassword, edtBirth;
+    private MaterialEditText edtId, edtPhone, edtName, edtPassword;
+    private MaterialAutoCompleteTextView edtBirth;
     private DatePickerDialog.OnDateSetListener mDataSetListener;
-    private Button btnSignUp;
+    private FButton btnBirthChoose, btnSignUp;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
+        edtId = (MaterialEditText) findViewById(R.id.edtId);
         edtName = (MaterialEditText) findViewById(R.id.edtName);
 
         edtPhone = (MaterialEditText) findViewById(R.id.edtPhone);
@@ -42,11 +45,14 @@ public class SignUp extends AppCompatActivity {
 
         edtPassword = (MaterialEditText) findViewById(R.id.edtPassword);
 
-        edtBirth = (MaterialEditText) findViewById(R.id.edtBirth);
-        edtBirth.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        btnBirthChoose = (FButton)findViewById(R.id.btnBirthChoose);
+
+        edtBirth = (MaterialAutoCompleteTextView) findViewById(R.id.edtBirth);
+        edtBirth.setEnabled(false);
+
+        btnBirthChoose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if(hasFocus) {
+            public void onClick(View v) {
                     Calendar cal = Calendar.getInstance();
                     int year = cal.get(Calendar.YEAR);
                     int month = cal.get(Calendar.MONTH);
@@ -55,11 +61,10 @@ public class SignUp extends AppCompatActivity {
                     mDataSetListener = new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                            Toast.makeText(SignUp.this, year + "/" + month + "/" + dayOfMonth, Toast.LENGTH_SHORT).show();
                             String birth;
                             if(month < 10)
-                                birth = Integer.toString(year) + "0" + Integer.toString(month) + Integer.toString(dayOfMonth);
-                            else birth = Integer.toString(year) + Integer.toString(month) + Integer.toString(dayOfMonth);
+                                birth = Integer.toString(year) + "0" + Integer.toString(month+1) + Integer.toString(dayOfMonth);
+                            else birth = Integer.toString(year) + Integer.toString(month+1) + Integer.toString(dayOfMonth);
                             edtBirth.setText(birth);
                         }
                     };
@@ -71,8 +76,8 @@ public class SignUp extends AppCompatActivity {
                     dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                     dialog.show();
-                }
             }
+
         });
         btnSignUp = findViewById(R.id.btnSignUp);
 
@@ -91,13 +96,13 @@ public class SignUp extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         //Check if already user phone
-                        if(dataSnapshot.child(edtPhone.getText().toString()).exists()){
+                        if(dataSnapshot.child(edtId.getText().toString()).exists()){
                             mDialog.dismiss();
                             Toast.makeText(SignUp.this, "Phone Number has already been registered", Toast.LENGTH_SHORT).show();
                         }else{
                             mDialog.dismiss();
-                            User user = new User(edtName.getText().toString(), edtPassword.getText().toString());
-                            table_user.child(edtPhone.getText().toString()).setValue(user);
+                            User user = new User(edtPhone.getText().toString(), edtName.getText().toString(), edtPassword.getText().toString(), edtBirth.getText().toString());
+                            table_user.child(edtId.getText().toString()).setValue(user);
                             Toast.makeText(SignUp.this, "Sign up successfully!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(SignUp.this, StartActivity.class);
                             startActivity(intent);
