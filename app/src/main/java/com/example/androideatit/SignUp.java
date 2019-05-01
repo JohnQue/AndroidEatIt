@@ -8,9 +8,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.androideatit.Model.User;
@@ -31,8 +34,9 @@ import info.hoang8f.widget.FButton;
 
 public class SignUp extends AppCompatActivity {
 
-    private MaterialEditText edtId, edtPhone, edtName, edtPassword;
+    private MaterialEditText edtId, edtPhone, edtName, edtPassword, edtPassword2;
     private MaterialAutoCompleteTextView edtBirth;
+    private ImageView setImage;
     private DatePickerDialog.OnDateSetListener mDataSetListener;
     private FButton btnBirthChoose, btnSignUp;
     @Override
@@ -48,12 +52,35 @@ public class SignUp extends AppCompatActivity {
         edtPhone.setEnabled(false);
 
         edtPassword = (MaterialEditText) findViewById(R.id.edtPassword);
+        edtPassword2 = (MaterialEditText) findViewById(R.id.edtPassword2);
 
         btnBirthChoose = (FButton)findViewById(R.id.btnBirthChoose);
 
         edtBirth = (MaterialAutoCompleteTextView) findViewById(R.id.edtBirth);
         edtBirth.setEnabled(false);
 
+        setImage = findViewById(R.id.setImage);
+        edtPassword2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (edtPassword.getText().toString().equals(edtPassword2.getText().toString())) {
+                    setImage.setImageResource(R.drawable.ic_check_black_24dp);
+                }
+                else {
+                    setImage.setImageResource(R.drawable.ic_close_black_24dp);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         btnBirthChoose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
