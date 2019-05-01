@@ -8,16 +8,20 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
 import com.example.androideatit.Model.User;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.rengwuxian.materialedittext.MaterialAutoCompleteTextView;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
@@ -61,10 +65,13 @@ public class SignUp extends AppCompatActivity {
                     mDataSetListener = new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                            String birth;
+                            String birth = Integer.toString(year);
                             if(month < 10)
-                                birth = Integer.toString(year) + "0" + Integer.toString(month+1) + Integer.toString(dayOfMonth);
-                            else birth = Integer.toString(year) + Integer.toString(month+1) + Integer.toString(dayOfMonth);
+                                birth += "0";
+                            birth += Integer.toString(month);
+                            if(dayOfMonth < 10)
+                                birth += "0";
+                            birth += Integer.toString(dayOfMonth);
                             edtBirth.setText(birth);
                         }
                     };
@@ -81,8 +88,7 @@ public class SignUp extends AppCompatActivity {
         });
         btnSignUp = findViewById(R.id.btnSignUp);
 
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        final DatabaseReference table_user = database.getReference("User");
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,29 +97,29 @@ public class SignUp extends AppCompatActivity {
                 mDialog.setMessage("Please waiting....");
                 mDialog.show();
 
+                User user = new User(edtPhone.getText().toString(),
+                        edtName.getText().toString(),
+                        edtPassword.getText().toString(),
+                        edtBirth.getText().toString());
                 // 아이디, 이름, 번호 다 입력했는지 체크
-               table_user.addValueEventListener(new ValueEventListener(){
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        //Check if already user phone
-                        if(dataSnapshot.child(edtId.getText().toString()).exists()){
-                            mDialog.dismiss();
-                            Toast.makeText(SignUp.this, "Phone Number has already been registered", Toast.LENGTH_SHORT).show();
-                        }else{
-                            mDialog.dismiss();
-                            User user = new User(edtPhone.getText().toString(), edtName.getText().toString(), edtPassword.getText().toString(), edtBirth.getText().toString());
-                            table_user.child(edtId.getText().toString()).setValue(user);
-                            Toast.makeText(SignUp.this, "Sign up successfully!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(SignUp.this, StartActivity.class);
-                            startActivity(intent);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
+                db.collection("User").document(edtId.getText().toString())
+                        .set(user)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d("TAG", "SignUp Successfully!");
+                                Toast.makeText(SignUp.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(SignUp.this, StartActivity.class);
+                                startActivity(intent);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(SignUp.this, "이미 등록된 아이디 입니다.", Toast.LENGTH_SHORT).show();
+                                Log.w("TAG", "Signup Failed!", e);
+                            }
+                        });
             }
         });
     }

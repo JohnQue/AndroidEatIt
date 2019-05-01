@@ -150,7 +150,7 @@ public class Home extends AppCompatActivity
         } else if (id == R.id.nav_log_out) {
             SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
-            editor.remove("edtPhone");
+            editor.remove("edtId");
             editor.remove("edtPassword");
             editor.apply();
 
